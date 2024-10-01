@@ -1,10 +1,10 @@
 // src/routes/reviewRoutes.js
-import { Router } from "express";
-import { extractReviews } from "../controllers/reviewController";
+const express = require("express");
+const { extractReviews } = require("../controllers/reviewController");
 
-const router = Router();
+const router = express.Router();
 
 // Route for getting reviews from a product page
 router.get("/", extractReviews);
 
-export default router;
+module.exports = router;

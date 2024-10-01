@@ -1,11 +1,11 @@
 // src/app.js
 require("dotenv").config();
-import express, { json } from "express";
-import reviewRoutes from "./routes/reviewRoutes.js";
+const express = require("express");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
-app.use(json());
+app.use(express.json());
 
 // API route for reviews
 app.use("/api/reviews", reviewRoutes);

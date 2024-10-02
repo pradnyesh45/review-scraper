@@ -4,7 +4,7 @@ async function handlePagination(page, paginationSelector) {
 
   if (nextPageButton) {
     await nextPageButton.click();
-    await page.waitForTimeout(2000); // Wait for the next page to load
+    await page.waitForLoadState("domcontentloaded"); // Wait for the next page to load
     return true;
   }
 

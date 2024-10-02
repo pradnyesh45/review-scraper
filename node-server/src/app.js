@@ -5,6 +5,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const cors = require("cors");
 
 const app = express();
+const router = express.Router();
 
 app.use(express.json());
 app.use(cors());

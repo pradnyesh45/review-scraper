@@ -4,7 +4,7 @@
 
 - I hope you have installed node and cloned the repo as mentioned in the root level readme file.
 - Go to the `react-client` directory on terminal, Inside `react-client `directory:
-- Type command `npm install` to install all the depencies.
+- Type command `npm install` to install all the dependencies.
 - We are done with the setup,
 - type `npm start` to start the react application on port 3000.
 

@@ -4,7 +4,8 @@
   "description": "An AI application which extracts reviews from urls of product websites.",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js"
   },
   "author": "Pradnyesh Aglawe",
   "license": "ISC",

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
-    "postinstall": "npx playwright install"
+    "postinstall": "npx playwright install chromium"
   },
   "author": "Pradnyesh Aglawe",
   "license": "ISC",

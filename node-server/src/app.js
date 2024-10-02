@@ -9,6 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+router.get("/", (req, res) => {
+  // Your logic to get reviews goes here
+  res.json({ message: "List of reviews" });
+});
+
 // API route for reviews
 app.use("/api/reviews", reviewRoutes);
 

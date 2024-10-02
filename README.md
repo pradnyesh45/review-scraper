@@ -11,7 +11,7 @@
 # Features implemented
 
 - Used Node js for backend and React js for frontend.
-- Used LLM provided by Gemini API to get the required information, not used OpenAI API payments as it wasn't accepting my debit card.
+- Used LLM provided by Gemini API to get the required information, not used OpenAI API as it wasn't accepting my debit card for payments.
 - Used Playwright to get the html of websites.
 
 # How to run?

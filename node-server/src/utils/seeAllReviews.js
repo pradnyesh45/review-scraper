@@ -27,7 +27,12 @@ const seeAllReviews = async (page) => {
       });
 
       // Attempt to click the "See All Reviews" button/link
-      await seeAllButton.click();
+      await Promise.race([
+        seeAllButton.click(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), 5000)
+        ),
+      ]);
       console.log("'See All Reviews' clicked successfully.");
 
       // Optionally close any popups that appear after clicking

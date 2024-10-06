@@ -84,7 +84,12 @@ const closePopup = async (page) => {
       });
 
       try {
-        await closeButton.click();
+        await Promise.race([
+          closeButton.click(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout")), 5000)
+          ),
+        ]);
         console.log("Popup closed successfully.");
       } catch (error) {
         console.error("Error clicking the close button:", error);

@@ -40,7 +40,7 @@ const handlePagination = async (
     await closePopup(page);
 
     const nextButton = await page.$(nextPageSelector); // Adjust this selector as per the page
-    console.log("Next button found:", nextButton);
+    // console.log("Next button found:", nextButton);
     if (nextButton) {
       const isDisabled = await page.evaluate(
         (button) => button.disabled,

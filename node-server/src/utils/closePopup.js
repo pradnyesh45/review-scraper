@@ -7,6 +7,63 @@ const closePopup = async (page) => {
 
   // Loop until there is no popup to close
   while (closePopup) {
+    // Generic logic to identify potential popup elements
+    const possiblePopupElements = await page.$$("div, section, aside");
+
+    for (const element of possiblePopupElements) {
+      const computedStyle = await element.evaluate((el) =>
+        window.getComputedStyle(el)
+      );
+      const zIndex = computedStyle.zIndex || "auto";
+
+      // Check for high z-index elements, or elements that look like popups
+      if (parseInt(zIndex, 10) > 1000) {
+        console.log("Detected potential popup with high z-index:", zIndex);
+
+        // Try clicking on any close button within the popup
+        const closeButton = await element.$(
+          'button, [aria-label="Close"], .close, .popup-close'
+        );
+        if (closeButton) {
+          console.log("Clicking close button.");
+          try {
+            await Promise.race([
+              closeButton.click(),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Timeout")), 5000)
+              ),
+            ]);
+            console.log("zIndex Popup closed successfully.");
+          } catch (error) {
+            console.warn("Error clicking the close button:", error);
+          }
+        }
+      }
+    }
+
+    // Check for ARIA role "dialog" (common for modals)
+    const dialogPopup = await page.$('[role="dialog"]');
+    if (dialogPopup) {
+      console.log("Detected a dialog popup.");
+      const closeButton = await dialogPopup.$(
+        'button, [aria-label="Close dialog"], .close'
+      );
+      if (closeButton) {
+        console.log("Clicking close button.");
+        try {
+          await Promise.race([
+            closeButton.click(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Timeout")), 5000)
+            ),
+          ]);
+          console.log("Dialog Popup closed successfully.");
+        } catch (error) {
+          console.warn("Error clicking the close button:", error);
+        }
+        console.log("Dialog closed successfully.");
+      }
+    }
     // Fetch the close popup selector
     const closePopupSelector = await getClosePopupSelector(page.content());
     console.log("Close Popup Selector:", closePopupSelector);

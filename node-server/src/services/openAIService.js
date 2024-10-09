@@ -28,7 +28,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 exports.getSeeAllReviewsSelector = async (html) => {
   try {
-    const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selector for the "See All Reviews" button.
+    const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selector for the text "See All Reviews" button.
     I want to put it in a variable like seeAllReviewsSelector in JavaScript.`;
 
     const result = await model.generateContent(prompt);
@@ -102,7 +102,7 @@ exports.getCSSSelectors = async (html) => {
     //   If the context is "pagination", return the selector for the "Next" button.
     // `;
 
-    const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selectors for reviews, titles, body, rating, reviewer, next page, overalay and close button of overlay. 
+    const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selectors for reviews, titles, body, rating, reviewer, next page(the selector which have inner text like 1, 2, 3... so on), overalay and close button of overlay. 
     I want to put them in variables like reviewSelector, titleSelector, bodySelector, ratingSelector, reviewerSelector, nextPageSelector, overlaySelector, closeOverlaySelector in JavaScript.`;
 
     // console.log("Prompt", prompt);

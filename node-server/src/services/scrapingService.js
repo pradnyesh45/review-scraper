@@ -17,6 +17,7 @@ const scrapeReviews = async (productUrl) => {
     timeout: 60000,
   });
   console.log(`Scraping reviews from ${productUrl}`);
+  await seeAllReviews(page);
 
   let reviews = [];
   let reviewsCount = 0;
@@ -34,7 +35,7 @@ const scrapeReviews = async (productUrl) => {
   while (true) {
     // Extract the page's HTML
     await closePopup(page);
-    await seeAllReviews(page);
+    // await seeAllReviews(page);
     const html = await page.content();
 
     // Get dynamic CSS selectors from OpenAI
@@ -81,18 +82,21 @@ const scrapeReviews = async (productUrl) => {
     console.log(`Scraped ${pageReviews.length} reviews from this page`);
 
     // Handle pagination - attempt to navigate to the next page
+    let paginationInnerTxt = 2;
     const nextPage = await handlePagination(
       page,
       cssSelectors.nextPageSelector,
       cssSelectors.reviewSelector,
       cssSelectors.overlaySelector,
-      cssSelectors.closeOverlaySelector
+      cssSelectors.closeOverlaySelector,
+      paginationInnerTxt
     );
 
     if (!nextPage) {
       console.log("No more pages to scrape.");
       break; // Exit the loop if there's no next page
     }
+    paginationInnerTxt++;
   }
 
   // // Handle pagination to retrieve reviews from additional pages

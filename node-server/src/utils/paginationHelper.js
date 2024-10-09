@@ -2,12 +2,14 @@
 
 const playwright = require("playwright");
 const { closePopup } = require("./closePopup");
+// const { next } = require("cheerio/dist/commonjs/api/traversing");
 const handlePagination = async (
   page,
   nextPageSelector,
   nextPageLoadedSelector,
   overlaySelector,
-  closeButtonSelector
+  closeButtonSelector,
+  innerText
 ) => {
   // Example for handling pagination with a "Next" button
   try {
@@ -39,8 +41,26 @@ const handlePagination = async (
 
     await closePopup(page);
 
-    const nextButton = await page.$(nextPageSelector); // Adjust this selector as per the page
-    // console.log("Next button found:", nextButton);
+    const getNextButton = async (page, nextPageSelector, innerText) => {
+      let button = await page.$(`${nextPageSelector}:has-text("${innerText}")`);
+      const nextPageSelectors = nextPageSelector.split(" ");
+      const nextPageSelectorLength = nextPageSelectors.length;
+      for (let i = 0; i < nextPageSelectorLength; i++) {
+        if (!button) {
+          button = await page.$(
+            `${nextPageSelectors[i]}:has-text("${innerText}")`
+          );
+        }
+      }
+      if (!button) {
+        button = await page.$(nextPageSelector);
+      }
+      return button;
+    };
+
+    const nextButton = await getNextButton(page, nextPageSelector, innerText);
+    // console.log("Next Button", nextButton.innerText());
+
     if (nextButton) {
       const isDisabled = await page.evaluate(
         (button) => button.disabled,
@@ -48,7 +68,12 @@ const handlePagination = async (
       );
 
       if (!isDisabled) {
-        await nextButton.click();
+        await Promise.race([
+          nextButton.click(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Timeout")), 5000)
+          ),
+        ]);
         console.log("Navigating to next page...");
 
         // Wait for the next page's content to load

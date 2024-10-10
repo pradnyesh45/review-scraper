@@ -42,24 +42,38 @@ const handlePagination = async (
     await closePopup(page);
 
     const getNextButton = async (page, nextPageSelector, innerText) => {
-      let button = await page.$(`${nextPageSelector}:has-text("${innerText}")`);
-      const nextPageSelectors = nextPageSelector.split(" ");
-      const nextPageSelectorLength = nextPageSelectors.length;
-      for (let i = 0; i < nextPageSelectorLength; i++) {
-        if (!button) {
-          button = await page.$(
-            `${nextPageSelectors[i]}:has-text("${innerText}")`
-          );
-        }
+      let button = await page.$(`${nextPageSelector}[aria-label*="next"]`);
+      if (!button) {
+        button = await page.$(
+          `${nextPageSelector}[aria-label*="${innerText}"]`
+        );
       }
       if (!button) {
-        button = await page.$(nextPageSelector);
+        button = await page.$(`${nextPageSelector}:has-text("${innerText}")`);
       }
+      if (nextPageSelector.includes(" ")) {
+        const nextPageSelectors = nextPageSelector.split(" ");
+        const nextPageSelectorLength = nextPageSelectors.length;
+        for (let i = 0; i < nextPageSelectorLength; i++) {
+          if (!button) {
+            button = await page.$(nextPageSelectors[i]);
+          }
+        }
+        for (let i = 0; i < nextPageSelectorLength; i++) {
+          if (!button) {
+            button = await page.$(
+              `${nextPageSelectors[i]}:has-text("${innerText}")`
+            );
+          }
+        }
+      }
+
       return button;
     };
 
     const nextButton = await getNextButton(page, nextPageSelector, innerText);
-    // console.log("Next Button", nextButton.innerText());
+    const buttonHtml = await nextButton.evaluate((el) => el.outerHTML);
+    console.log("Next button HTML:", buttonHtml);
 
     if (nextButton) {
       const isDisabled = await page.evaluate(

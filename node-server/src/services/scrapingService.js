@@ -1,6 +1,6 @@
 // src/services/scrapingService.js
 const playwright = require("playwright");
-const { getCSSSelectors } = require("./openAIService");
+const { getCSSSelectors } = require("./GeminiAPIService");
 const { handlePagination } = require("../utils/paginationHelper");
 const { closePopup } = require("../utils/closePopup");
 const { seeAllReviews } = require("../utils/seeAllReviews");
@@ -17,6 +17,7 @@ const scrapeReviews = async (productUrl) => {
     timeout: 60000,
   });
   console.log(`Scraping reviews from ${productUrl}`);
+  await closePopup(page);
   await seeAllReviews(page);
 
   let reviews = [];
@@ -67,6 +68,11 @@ const scrapeReviews = async (productUrl) => {
             el.querySelector(selectors.bodySelector)?.innerText || "No body",
           rating:
             el.querySelector(selectors.ratingSelector)?.innerText ||
+            Number(
+              el
+                .querySelector(selectors.ratingSelector)
+                ?.ariaLabel?.split(" ")[0]
+            ) ||
             "No rating",
           reviewer:
             el.querySelector(selectors.reviewerSelector)?.innerText ||

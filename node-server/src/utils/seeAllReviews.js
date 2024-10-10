@@ -1,6 +1,6 @@
 // src/utils/paginationHelper.js
 
-const { getSeeAllReviewsSelector } = require("../services/openAIService");
+const { getSeeAllReviewsSelector } = require("../services/GeminiAPIService");
 
 const seeAllReviews = async (page) => {
   try {

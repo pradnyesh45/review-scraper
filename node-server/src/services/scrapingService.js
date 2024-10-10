@@ -7,7 +7,7 @@ const { seeAllReviews } = require("../utils/seeAllReviews");
 
 const scrapeReviews = async (productUrl) => {
   console.log("productUrl", productUrl);
-  const browser = await playwright.chromium.launch({ headless: false });
+  const browser = await playwright.chromium.launch({ headless: true });
   const page = await browser.newPage();
   console.log("Browser opened");
 

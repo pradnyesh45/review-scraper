@@ -12,10 +12,15 @@ const ReviewDisplay = () => {
 
     try {
       console.log("productUrl", productUrl);
+      let rootUrl = null;
+      if (process.env.NODE_ENV === "production") {
+        rootUrl =
+          "https://review-scraper-backend.onrender.com/api/reviews?page";
+      } else {
+        rootUrl = "http://localhost:9000/api/reviews?page";
+      }
       const response = await fetch(
-        `http://localhost:9000/api/reviews?page=${encodeURIComponent(
-          productUrl
-        )}`
+        `${rootUrl}=${encodeURIComponent(productUrl)}`
       );
       console.log("response", response);
       const data = await response.json();

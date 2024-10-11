@@ -4,10 +4,14 @@ const { getCSSSelectors } = require("./GeminiAPIService");
 const { handlePagination } = require("../utils/paginationHelper");
 const { closePopup } = require("../utils/closePopup");
 const { seeAllReviews } = require("../utils/seeAllReviews");
+const { cleaningHtml } = require("../utils/cleanHTML");
 
 const scrapeReviews = async (productUrl) => {
   console.log("productUrl", productUrl);
-  const browser = await playwright.chromium.launch({ headless: true });
+  const browser =
+    process.env.NODE_ENV === "production"
+      ? await playwright.chromium.launch({ headless: true })
+      : await playwright.chromium.launch({ headless: false });
   const page = await browser.newPage();
   console.log("Browser opened");
 
@@ -32,16 +36,18 @@ const scrapeReviews = async (productUrl) => {
 
   // reviews = reviews.concat(cssSelectors);
   // reviewsCount += reviews.length;
+  let paginationInnerTxt = 2;
 
   while (true) {
     // Extract the page's HTML
-    await closePopup(page);
+    // await closePopup(page);
     // await seeAllReviews(page);
     const html = await page.content();
+    // const html = await cleaningHtml(page);
 
     // Get dynamic CSS selectors from OpenAI
     const cssSelectors = await getCSSSelectors(html);
-    // await closePopup(page);
+    await closePopup(page);
     console.log("CSS Selectors", cssSelectors);
 
     if (
@@ -55,7 +61,7 @@ const scrapeReviews = async (productUrl) => {
       break;
     }
 
-    await closePopup(page);
+    // await closePopup(page);
 
     // Scrape reviews from the current page using the identified CSS selectors
     const pageReviews = await page.$$eval(
@@ -73,6 +79,9 @@ const scrapeReviews = async (productUrl) => {
                 .querySelector(selectors.ratingSelector)
                 ?.ariaLabel?.split(" ")[0]
             ) ||
+            Number(
+              el.querySelector(selectors.ratingSelector)?.title?.split(" ")[0]
+            ) ||
             "No rating",
           reviewer:
             el.querySelector(selectors.reviewerSelector)?.innerText ||
@@ -88,21 +97,25 @@ const scrapeReviews = async (productUrl) => {
     console.log(`Scraped ${pageReviews.length} reviews from this page`);
 
     // Handle pagination - attempt to navigate to the next page
-    let paginationInnerTxt = 2;
+    // let paginationInnerTxt = 2;
     const nextPage = await handlePagination(
       page,
       cssSelectors.nextPageSelector,
       cssSelectors.reviewSelector,
       cssSelectors.overlaySelector,
       cssSelectors.closeOverlaySelector,
-      paginationInnerTxt
+      paginationInnerTxt.toString()
     );
 
-    if (!nextPage) {
+    if (!nextPage || paginationInnerTxt > 3) {
       console.log("No more pages to scrape.");
       break; // Exit the loop if there's no next page
     }
     paginationInnerTxt++;
+    console.log(
+      "Navigating to next page... paginationInnerText: ",
+      paginationInnerTxt
+    );
   }
 
   // // Handle pagination to retrieve reviews from additional pages

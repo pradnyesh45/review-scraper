@@ -39,10 +39,14 @@ const handlePagination = async (
     //   }
     // }
 
-    await closePopup(page);
+    // await closePopup(page);
 
     const getNextButton = async (page, nextPageSelector, innerText) => {
       let button = await page.$(`${nextPageSelector}[aria-label*="next"]`);
+      if (!button) {
+        const buttonSelector = `div.R-PaginationControls__item[role="button"][tabindex="0"][data-type="link"]:has-text("${innerText}")`;
+        button = await page.waitForSelector(buttonSelector);
+      }
       if (!button) {
         button = await page.$(
           `${nextPageSelector}[aria-label*="${innerText}"]`
@@ -85,14 +89,14 @@ const handlePagination = async (
         await Promise.race([
           nextButton.click(),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Timeout")), 5000)
+            setTimeout(() => reject(new Error("Timeout")), 1000)
           ),
         ]);
         console.log("Navigating to next page...");
 
         // Wait for the next page's content to load
         await page.waitForSelector(nextPageLoadedSelector, {
-          timeout: 10000,
+          timeout: 2000,
           visible: true,
         });
 

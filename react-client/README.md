@@ -5,8 +5,10 @@
 - I hope you have installed node and cloned the repo as mentioned in the root level readme file.
 - Go to the `react-client` directory on terminal, Inside `react-client `directory:
 - Type command `npm install` to install all the dependencies.
+- Create .env file and copy paste env_example content into .env.
 - We are done with the setup,
 - type `npm start` to start the react application on port 3000.
+- Additionally, you can directly use the hosted website: https://review-scraper-client.vercel.app/
 
 # Examples
 

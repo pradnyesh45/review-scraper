@@ -6,7 +6,7 @@ const { closePopup } = require("./closePopup");
 const seeAllReviews = async (page) => {
   try {
     const seeAllReviewsButtonSelector = 'span.r-view-all[role="button"]';
-    let seeAllButton = await page.waitForSelector(seeAllReviewsButtonSelector);
+    let seeAllButton = await page.$(seeAllReviewsButtonSelector);
     const seeAllReviewsButtonHtml1 = await seeAllButton.evaluate(
       (el) => el.outerHTML
     );
@@ -24,10 +24,7 @@ const seeAllReviews = async (page) => {
 
     // Wait for the "See All Reviews" button/link to be visible
     if (!seeAllButton) {
-      seeAllButton = await page.waitForSelector(seeAllReviewsSelector, {
-        visible: true,
-        timeout: 1000,
-      });
+      seeAllButton = await page.$(seeAllReviewsSelector);
     }
     if (!seeAllButton) {
       seeAllButton = await page.$(

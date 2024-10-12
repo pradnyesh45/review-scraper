@@ -109,9 +109,7 @@ const closePopup = async (page) => {
       closeButton = await new Promise((resolve) => {
         setTimeout(async () => {
           try {
-            resolve(
-              await page.waitForSelector(closePopupSelector, { timeout: 1000 })
-            );
+            resolve(await page.$(closePopupSelector, { timeout: 1000 }));
           } catch (error) {
             console.error("Error waiting for first selector:", error);
             resolve(null); // Resolve with null to allow fallback to next selector
@@ -129,11 +127,7 @@ const closePopup = async (page) => {
         closeButton = await new Promise((resolve) => {
           setTimeout(async () => {
             try {
-              resolve(
-                await page.waitForSelector(closePopupSelector, {
-                  timeout: 1000,
-                })
-              );
+              resolve(await page.$(closePopupSelector));
             } catch (error) {
               console.error("Error waiting for second selector:", error);
               resolve(null); // Resolve with null to allow fallback to next selector
@@ -152,11 +146,7 @@ const closePopup = async (page) => {
         closeButton = await new Promise((resolve) => {
           setTimeout(async () => {
             try {
-              resolve(
-                await page.waitForSelector(closePopupSelector, {
-                  timeout: 1000,
-                })
-              );
+              resolve(await page.$(closePopupSelector));
             } catch (error) {
               console.error("Error waiting for third selector:", error);
               resolve(null); // Resolve with null as no more fallback

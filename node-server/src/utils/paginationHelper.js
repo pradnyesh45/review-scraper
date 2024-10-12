@@ -39,14 +39,40 @@ const handlePagination = async (
     //   }
     // }
 
-    // await closePopup(page);
+    await closePopup(page);
 
     const getNextButton = async (page, nextPageSelector, innerText) => {
-      let button = await page.$(`${nextPageSelector}[aria-label*="next"]`);
+      let button = null;
+      if (nextPageSelector.includes(" ")) {
+        const nextPageSelectors = nextPageSelector.split(" ");
+        const nextPageSelectorLength = nextPageSelectors.length;
+        for (let i = 0; i < nextPageSelectorLength; i++) {
+          if (!button) {
+            console.log("Picking next page selector from innerText", innerText);
+            button = await page.$(
+              `${nextPageSelectors[i]}:has-text("${innerText}")`
+            );
+          }
+        }
+        for (let i = 0; i < nextPageSelectorLength; i++) {
+          if (!button) {
+            console.log(
+              "Picking next page selector from nextPageSelectors[i]",
+              nextPageSelectors[i]
+            );
+            button = await page.$(nextPageSelectors[i]);
+          }
+        }
+      }
+      if (!button) {
+        button = await page.$(`${nextPageSelector}[aria-label*="next"]`);
+      }
+
       if (!button) {
         const buttonSelector = `div.R-PaginationControls__item[role="button"][tabindex="0"][data-type="link"]:has-text("${innerText}")`;
-        button = await page.waitForSelector(buttonSelector);
+        button = await page.$(buttonSelector);
       }
+      console.log("Reached after selector, or errored out already?");
       if (!button) {
         button = await page.$(
           `${nextPageSelector}[aria-label*="${innerText}"]`
@@ -54,22 +80,6 @@ const handlePagination = async (
       }
       if (!button) {
         button = await page.$(`${nextPageSelector}:has-text("${innerText}")`);
-      }
-      if (nextPageSelector.includes(" ")) {
-        const nextPageSelectors = nextPageSelector.split(" ");
-        const nextPageSelectorLength = nextPageSelectors.length;
-        for (let i = 0; i < nextPageSelectorLength; i++) {
-          if (!button) {
-            button = await page.$(nextPageSelectors[i]);
-          }
-        }
-        for (let i = 0; i < nextPageSelectorLength; i++) {
-          if (!button) {
-            button = await page.$(
-              `${nextPageSelectors[i]}:has-text("${innerText}")`
-            );
-          }
-        }
       }
 
       return button;
@@ -89,16 +99,20 @@ const handlePagination = async (
         await Promise.race([
           nextButton.click(),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Timeout")), 1000)
+            setTimeout(() => reject(new Error("Timeout")), 60000)
           ),
         ]);
+        // nextButton.click();
         console.log("Navigating to next page...");
 
         // Wait for the next page's content to load
-        await page.waitForSelector(nextPageLoadedSelector, {
-          timeout: 2000,
-          visible: true,
-        });
+        // await page.waitForSelector(".jdgm-rev-widg__body", {
+        //   timeout: 2000,
+        //   visible: true,
+        // });
+
+        // Add a wait for 3 seconds
+        await page.waitForTimeout(3000);
 
         console.log("Next page loaded successfully.");
         return true;

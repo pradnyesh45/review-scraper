@@ -1,13 +1,17 @@
 // src/services/scrapingService.js
 const playwright = require("playwright");
-const { getCSSSelectors } = require("./GeminiAPIService");
+const {
+  getCSSSelectors,
+  getDirectJsonResponseV2,
+  getNextPageSelector,
+} = require("./GeminiAPIService");
 const { handlePagination } = require("../utils/paginationHelper");
 const { closePopup } = require("../utils/closePopup");
 const { seeAllReviews } = require("../utils/seeAllReviews");
 const { cleaningHtml } = require("../utils/cleanHTML");
 const { scrollToBottom, closeOverlay } = require("../utils/scrapeHelper");
 
-const scrapeReviews = async (productUrl) => {
+const scrapeReviewsV2 = async (productUrl) => {
   console.log("productUrl", productUrl);
   const browser =
     process.env.NODE_ENV === "production"
@@ -40,28 +44,28 @@ const scrapeReviews = async (productUrl) => {
 
   // reviews = reviews.concat(cssSelectors);
   // reviewsCount += reviews.length;
-  let paginationInnerTxt = 2;
+  let paginationInnerTxt = 1;
 
-  const html = await page.content();
-  // const html = await cleaningHtml(page);
+  //   const html = await page.content();
+  //   const html = await cleaningHtml(page);
 
-  // Get dynamic CSS selectors from OpenAI
-  const cssSelectors = await getCSSSelectors(html);
-  await closePopup(page);
-  console.log("CSS Selectors", cssSelectors);
+  //   // Get dynamic CSS selectors from OpenAI
+  //   const jsonResponseOfReviews = await getDirectJsonResponseV2(html);
+  //   await closePopup(page);
+  //   console.log("JSON Response of Reviews", jsonResponseOfReviews);
 
-  if (
-    !cssSelectors.reviewSelector ||
-    !cssSelectors.titleSelector ||
-    !cssSelectors.ratingSelector ||
-    !cssSelectors.bodySelector ||
-    !cssSelectors.reviewerSelector
-  ) {
-    console.log("Missing required CSS selectors. Exiting...");
-    return null;
-  }
+  //   reviews = reviews.concat(jsonResponseOfReviews);
+  //   reviewsCount += reviews.length;
 
   while (true) {
+    const html = await cleaningHtml(page);
+    const jsonResponseOfReviews = await getDirectJsonResponseV2(html);
+    await closePopup(page);
+    console.log("JSON Response of Reviews", jsonResponseOfReviews);
+
+    reviews = reviews.concat(jsonResponseOfReviews);
+    reviewsCount += jsonResponseOfReviews.length;
+
     // Extract the page's HTML
     // await closePopup(page);
     // await seeAllReviews(page);
@@ -87,46 +91,49 @@ const scrapeReviews = async (productUrl) => {
     // await closePopup(page);
 
     // Scrape reviews from the current page using the identified CSS selectors
-    const pageReviews = await page.$$eval(
-      cssSelectors.reviewSelector,
-      (reviewElements, selectors) => {
-        return reviewElements.map((el) => ({
-          title:
-            el.querySelector(selectors.titleSelector)?.innerText || "No title",
-          body:
-            el.querySelector(selectors.bodySelector)?.innerText || "No body",
-          rating:
-            el.querySelector(selectors.ratingSelector)?.innerText ||
-            Number(
-              el
-                .querySelector(selectors.ratingSelector)
-                ?.ariaLabel?.split(" ")[0]
-            ) ||
-            Number(
-              el.querySelector(selectors.ratingSelector)?.title?.split(" ")[0]
-            ) ||
-            "No rating",
-          reviewer:
-            el.querySelector(selectors.reviewerSelector)?.innerText ||
-            "Anonymous",
-        }));
-      },
-      cssSelectors
-    );
+    // const pageReviews = await page.$$eval(
+    //   cssSelectors.reviewSelector,
+    //   (reviewElements, selectors) => {
+    //     return reviewElements.map((el) => ({
+    //       title:
+    //         el.querySelector(selectors.titleSelector)?.innerText || "No title",
+    //       body:
+    //         el.querySelector(selectors.bodySelector)?.innerText || "No body",
+    //       rating:
+    //         el.querySelector(selectors.ratingSelector)?.innerText ||
+    //         Number(
+    //           el
+    //             .querySelector(selectors.ratingSelector)
+    //             ?.ariaLabel?.split(" ")[0]
+    //         ) ||
+    //         Number(
+    //           el.querySelector(selectors.ratingSelector)?.title?.split(" ")[0]
+    //         ) ||
+    //         "No rating",
+    //       reviewer:
+    //         el.querySelector(selectors.reviewerSelector)?.innerText ||
+    //         "Anonymous",
+    //     }));
+    //   },
+    //   cssSelectors
+    // );
 
-    reviews = reviews.concat(pageReviews);
-    reviewsCount += pageReviews.length;
+    // reviews = reviews.concat(pageReviews);
+    // reviewsCount += pageReviews.length;
 
-    console.log(`Scraped ${pageReviews.length} reviews from this page`);
+    console.log(`Scraped ${reviews.length} reviews from this page`);
 
     // Handle pagination - attempt to navigate to the next page
     // let paginationInnerTxt = 2;
+    // const reviewsHtml = getHtmlOfReviewsV2(html);
+    const nextPageSelector = await getNextPageSelector(html);
+    paginationInnerTxt++;
     const nextPage = await handlePagination(
       page,
-      cssSelectors.nextPageSelector,
-      cssSelectors.reviewSelector,
-      cssSelectors.overlaySelector,
-      cssSelectors.closeOverlaySelector,
+      nextPageSelector,
+      null,
+      null,
+      null,
       paginationInnerTxt.toString()
     );
 
@@ -134,13 +141,15 @@ const scrapeReviews = async (productUrl) => {
       console.log("No more pages to scrape.");
       break; // Exit the loop if there's no next page
     }
-    paginationInnerTxt++;
+
     console.log(
       "Navigating to next page... paginationInnerText: ",
       paginationInnerTxt
     );
   }
+  await browser.close();
 
+  return { reviews_count: reviewsCount, reviews };
   // // Handle pagination to retrieve reviews from additional pages
   // let hasNextPage = true;
 
@@ -163,10 +172,6 @@ const scrapeReviews = async (productUrl) => {
   //     reviewsCount += newReviews.length;
   //   }
   // }
-
-  await browser.close();
-
-  return { reviews_count: reviewsCount, reviews };
 };
 
-module.exports = { scrapeReviews };
+module.exports = { scrapeReviewsV2 };

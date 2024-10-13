@@ -21,6 +21,7 @@ const scrollToBottom = async (page) => {
 const closeOverlay = async (page) => {
   let closeButtonSelectors = [
     `[data-testid="CloseIcon"]`,
+    `button.animate-fade-in[aria-disabled="false"]`,
     `button.klaviyo-close-form.kl-private-reset-css-Xuajs1[aria-label="Close dialog"]`,
     ".store-selection-popup--inner .store-selection-popup--close",
     ".MuiSvgIcon-root.MuiSvgIcon-fontSizeInherit",

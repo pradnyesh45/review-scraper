@@ -9,13 +9,17 @@
 - We are done with the setup,
 - type `npm start` to start the react application on port 3000.
 - Additionally, you can directly use the hosted website: https://review-scraper-client.vercel.app/
+- To get started, you just need to put the url in the text box, selecting V1/V2 version from the dropbox.
 
 # Examples
 
-- Input: `https://2717recovery.com/products/recovery-cream` in the text box.
-- Output: ![Output Image](./public/Output%20Screenshot.png)
+- Localhost using V1 version
+- Output: ![Localhost V1 version](./public/localhost%20V1%20version.png)
 
-  # (Optional from here) Below is Auto Generated text from react(you can skip it).
+- Localhost using V2 version
+- Output: ![Localhost V2 version](./public/localhost%20V2%20version.png)
+
+# (Optional from here) Below is Auto Generated text from react(you can skip it).
 
 # Getting Started with Create React App
 

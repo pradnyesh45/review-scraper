@@ -35,9 +35,20 @@
 
 ## Examples
 
-- Notice the API endpoint reveiwsV1
-- Output: ![Output Image](./public/Output%20Screenshot.png)
+- Localhost V1 version, Notice the API endpoint reveiwsV1(localhost)
+- Output: ![Backend Localhost V1 Version](./images/localhost%20reviews%20V1.png)
 
-- Notice the API endpoint reveiwsV2
-- Here, [GoogleGenerativeAI Error]: Candidate was blocked due to SAFETY. Hence, only 10 are showing currently
-- Output: ![Output Image](./public/Output%20Screenshot.png)
+- Localhost V2 version, Notice the API endpoint reveiwsV2(localhost)
+- Here, [GoogleGenerativeAI Error]: Candidate was blocked due to SAFETY. Hence, only 10 are showing currently(happens sometimes)
+- Output: ![Backend Localhost V2 Version](./images/localhost%20reviews%20V2.png)
+
+- Deployed backend V1 version, Notice the version V1 and url(deployed backend)
+- Output: ![Backend Deployed V1 Version](./images/hosted%20reviews%20V1.png)
+
+## Issues(Important)
+
+- On 13th oct, I am not able to make requests on backend hosted on render. Its giving timeout on page.goto, but yesterday(12th oct) it was woring fine. Even though its working in the local setup.
+- Output: ![Render browser issue](./images/Render%20playwright%20issue.png)
+
+- Sometimes, it gives 502 Bad Request. I think it is because I am on a free tier. It might improve if I shift to a paid instance.
+- Output: ![Render 502 Bad Request](./images/Render%20502%20bad%20request.png)

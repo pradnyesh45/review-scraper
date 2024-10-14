@@ -2,7 +2,6 @@
 
 const playwright = require("playwright");
 const { closePopup } = require("./closePopup");
-// const { next } = require("cheerio/dist/commonjs/api/traversing");
 const handlePagination = async (
   page,
   nextPageSelector,
@@ -76,7 +75,6 @@ const handlePagination = async (
             setTimeout(() => reject(new Error("Timeout")), 60000)
           ),
         ]);
-        // nextButton.click();
         console.log("Navigating to next page...");
 
         // Add a wait for 3 seconds

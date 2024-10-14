@@ -5,27 +5,6 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Initialize Gemini API
-// const geminiApi = axios.create({
-//   baseURL: "https://api.gemini.com/v1", // Update this to the actual base URL of Gemini API
-//   headers: {
-//     Authorization: `Bearer ${process.env.GEMINI_API_KEY}`,
-//     "Content-Type": "application/json",
-//   },
-// });
-
-// const getHtmlOfReviews = (html) => {
-//   const $ = cheerio.load(html);
-//   const reviews = [];
-
-//   // Find potential review containers using class names or ids that contain 'review'
-//   $('[class*="review"], [class*="reviews"]').each((i, elem) => {
-//     reviews.push($(elem).html());
-//   });
-
-//   return reviews.length ? reviews.join("\n") : null;
-// };
-
 exports.getSeeAllReviewsSelector = async (html) => {
   try {
     const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selector for the text "See All Reviews" or "See more reviews"button.
@@ -78,35 +57,9 @@ exports.getClosePopupSelector = async (html) => {
 
 exports.getCSSSelectors = async (html) => {
   try {
-    // Send a prompt to Gemini API to extract the final outcome for reviews
-
-    // const reviews = getHtmlOfReviews(html);
-    // // console.log("Reviews", reviews);
-
-    // if (!reviews) {
-    //   throw new Error("No relevant 'review' elements found in the HTML.");
-    // }
-    // const prompt = `From the given html, return a list which
-    // contains {title: $titleText, body: bodyText, rating: ratingNumber, reviewer: reviewerText}.
-    // Just Return a json format like {[{review1}, {review2}]}.
-    // Just strintly json output, consider it as function which
-    // returns json and nothing else.
-    // Do not explain/add anything extra.
-    // Do not return anything else but valid JSON.
-    // Html:\n${reviews}`;
-    //   const prompt = `
-    //   Extract the relevant CSS selectors for pagination from the following HTML:
-    //   ${html}
-
-    //   return selectors for review titles, bodies, ratings, and reviewers.
-    //   If the context is "pagination", return the selector for the "Next" button.
-    // `;
-
     const prompt = `Here is an HTML snippet:\n${html}\nIdentify the CSS selectors for reviews, titles, body, rating, reviewer, next page(the selector which have inner text like 1, 2, 3... so on), overalay and close button of overlay. 
     I want to put them in variables like reviewSelector, titleSelector, bodySelector, ratingSelector, reviewerSelector, nextPageSelector, overlaySelector, closeOverlaySelector in JavaScript.
     Don't return any comments or explanations, just the selectors.`;
-
-    // console.log("Prompt", prompt);
 
     const result = await model.generateContent(prompt);
     const resultText = result.response.text();
@@ -155,38 +108,6 @@ exports.getCSSSelectors = async (html) => {
     console.log("Overlay Selector:", overlaySelector);
     console.log("Close Overlay Selector:", closeOverlaySelector);
 
-    // if (true) {
-    //   const newPrompt = `Just return a valid CSS selector which I can put in const nextPageSelector in javascript for HTML: ${html}`;
-    //   const newResult = await model.generateContent(newPrompt);
-    //   const newResultText = await newResult.response.text();
-
-    //   console.log("New result text:", newResultText); // Log the full result
-
-    //   // Extract the part that contains the actual CSS selector
-    //   const selectorMatch = newResultText.match(/'(.*)'/); // Extract the content between single quotes
-
-    //   let nextPageSelector = "";
-    //   if (selectorMatch && selectorMatch[1]) {
-    //     nextPageSelector = selectorMatch[1]; // Assign the extracted CSS selector
-    //   }
-
-    //   // Log the extracted CSS selector
-    //   console.log("Assigned nextPageSelector:", nextPageSelector);
-    // }
-
-    // const cleanedResult = resultText.match(/\[.*\]/s); // This will extract anything between `[` and `]`
-    // console.log("cleanedResult", cleanedResult);
-
-    // if (!cleanedResult) {
-    //   throw new Error("Invalid JSON structure received.");
-    // }
-    // const jsonString = cleanedResult[0];
-
-    // console.log("jsonString: ", jsonString);
-
-    // const resultJson = JSON.parse(jsonString);
-    // console.log("resultJson", jsonString);
-    // return resultJson;
     return {
       reviewSelector,
       titleSelector,
@@ -206,10 +127,7 @@ exports.getCSSSelectors = async (html) => {
 const getHtmlOfReviewsV2 = (html) => {
   const $ = cheerio.load(html);
   const reviews = [];
-  // Find potential review containers using class names or ids that contain 'review'
-  // $('[class*="review"], [class*="reviews"]').each((i, elem) => {
-  //   reviews.push($(elem).html());
-  // });
+
   $(
     '[class*="jdgm-rev-widg__body"], [class*="yotpo-reviews-container"], [class*="ElementsWidget__list"], [class*="review-views"], [class*="review"], [class*="reviews"]'
   ).each((i, elem) => {
@@ -222,7 +140,6 @@ exports.getDirectJsonResponseV2 = async (html) => {
   try {
     // Send a prompt to Gemini API to extract the final outcome for reviews
     const reviews = getHtmlOfReviewsV2(html);
-    // console.log("Reviews", reviews);
     if (!reviews) {
       throw new Error("No relevant 'review' elements found in the HTML.");
     }
@@ -234,7 +151,6 @@ exports.getDirectJsonResponseV2 = async (html) => {
     Do not explain/add anything extra.
     Do not return anything else but valid JSON.
     Html:\n${reviews}`;
-    // console.log("Prompt", prompt);
     const result = await model.generateContent(prompt);
     let resultText = result.response.text();
 
@@ -283,7 +199,6 @@ exports.getNextPageSelector = async (html) => {
     let nextPageSelector = "";
     if (resultText.includes("=")) {
       const nextPageSelectorMatch = resultText.match(
-        // /nextPageSelector\s*=\s*'(.*)'/
         /nextPageSelector\s*=\s*["'](.*)["']/
       );
 

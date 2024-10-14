@@ -12,7 +12,7 @@ router.get("/api/reviewsV1", extractReviews);
 router.get("/api/reviewsV2", extractReviewsV2);
 
 router.get("/", (req, res) => {
-  // Your logic to get reviews goes here
+  // landing page
   console.log("List of reviews");
   res.json({ message: "List of reviews" });
 });

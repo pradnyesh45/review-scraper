@@ -13,32 +13,6 @@ const handlePagination = async (
 ) => {
   // Example for handling pagination with a "Next" button
   try {
-    // Check if any overlay exists
-    // const overlay = await page.$(overlaySelector);
-    // if (overlay) {
-    //   console.log("Overlay detected, attempting to close it...");
-
-    //   // Try clicking the close button if it exists
-    //   const closeButton = await page.$(closeButtonSelector);
-    //   if (closeButton) {
-    //     await closeButton.click();
-    //     console.log("Overlay closed.");
-    //   } else {
-    //     console.log(
-    //       "No close button found. Waiting for overlay to disappear..."
-    //     );
-    //     await page.waitForFunction(
-    //       (selector) => {
-    //         const el = document.querySelector(selector);
-    //         return el === null || el.style.display === "none";
-    //       },
-    //       {},
-    //       overlaySelector
-    //     );
-    //     console.log("Overlay has disappeared.");
-    //   }
-    // }
-
     await closePopup(page);
 
     const getNextButton = async (page, nextPageSelector, innerText) => {
@@ -104,12 +78,6 @@ const handlePagination = async (
         ]);
         // nextButton.click();
         console.log("Navigating to next page...");
-
-        // Wait for the next page's content to load
-        // await page.waitForSelector(".jdgm-rev-widg__body", {
-        //   timeout: 2000,
-        //   visible: true,
-        // });
 
         // Add a wait for 3 seconds
         await page.waitForTimeout(3000);
